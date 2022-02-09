@@ -1,5 +1,21 @@
 import dbConnect from '../../lib/dbConnect'
 import Movie from '../../models/Movie'
+import Cors from 'cors'
+
+const cors = Cors({
+  methods: [ 'GET', 'HEAD', 'POST', 'OPTIONS']
+})
+
+function runMiddleware(req, res, fn) {
+  return new Promise((resolve, reject) => {
+    fn(req, res, (result) => {
+      if (result instanceof Error) {
+        return reject(result)
+      }
+      return resolve(result)
+    })
+  })
+}
 
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 
@@ -7,6 +23,9 @@ import Movie from '../../models/Movie'
 //   res.status(200).json({ name: 'John Doe' })
 // }
 export default async function handler(req, res) {
+
+  await runMiddleware(req, res, cors)
+
   const { method } = req
 
   await dbConnect()
